@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clip to social · TBMC</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400..600&family=Instrument+Sans:wght@400..600&display=swap');
+  :root {
+    --green-1:#0A1C1E; --green-2:#003331; --green-3:#035956; --green-4:#435C5B;
+    --gold:#D49625; --beige-3:#F8F8F6; --beige-2:#F2EBE2; --beige-1:#CFBCA5; --white:#fff;
+    --ink:var(--green-1); --paper:var(--beige-3); --rule:var(--beige-2);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Instrument Sans',-apple-system,sans-serif; line-height:1.5; }
+  .wrap { max-width:760px; margin:0 auto; padding:44px 22px 80px; }
+  h1 { font-family:'Lora',Georgia,serif; font-size:30px; font-weight:600; letter-spacing:-.015em; margin:0; }
+  .sub { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--green-4); margin:5px 0 0; }
+  .card { background:var(--white); border:1px solid var(--rule); border-radius:6px; padding:22px; margin-top:26px;
+    box-shadow:0 2px 10px rgba(10,28,30,.05); }
+  label { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.11em; color:var(--green-4); margin:0 0 6px; }
+  .row { margin-bottom:16px; }
+  input[type=file], select, textarea, input[type=text] {
+    width:100%; font-family:inherit; font-size:14px; padding:11px 12px; border:1px solid var(--rule);
+    border-radius:4px; background:var(--paper); color:var(--ink); }
+  textarea { min-height:70px; resize:vertical; }
+  .btn { font-family:inherit; font-size:13px; text-transform:uppercase; letter-spacing:.07em;
+    background:var(--green-3); color:var(--paper); border:none; border-radius:4px; padding:13px 26px; cursor:pointer; }
+  .btn:hover:not(:disabled){ background:var(--green-2); }
+  .btn:disabled { background:var(--rule); color:var(--green-4); cursor:wait; }
+  .status { font-size:13px; color:var(--green-3); margin-top:16px; min-height:20px; }
+  .status.err { color:#9A3B2E; }
+  .out { margin-top:26px; }
+  .block { background:var(--white); border:1px solid var(--rule); border-left:3px solid var(--green-3);
+    border-radius:0 5px 5px 0; padding:16px 18px; margin-bottom:14px; }
+  .block h3 { font-family:'Lora',serif; font-size:14px; margin:0 0 10px; text-transform:uppercase; letter-spacing:.04em; color:var(--green-4); }
+  .opt { font-size:14.5px; white-space:pre-wrap; padding:10px 0; border-top:1px dashed var(--rule); }
+  .opt:first-of-type { border-top:none; }
+  .pull { border-left-color:var(--gold); }
+  .flag { background:#FBF4E6; border:1px solid var(--gold); border-radius:4px; padding:12px 15px; font-size:13.5px; margin-bottom:14px; }
+  .muted { color:var(--green-4); font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Clip to social</h1>
+    <p class="sub">TBMC · drop a clip, get on-brand copy</p>
+
+    <div class="card">
+      <div class="row">
+        <label for="file">Audio or video clip</label>
+        <input type="file" id="file" accept="audio/*,video/*" />
+      </div>
+      <div class="row">
+        <label for="channel">Draft for</label>
+        <select id="channel">
+          <option value="both">X and LinkedIn</option>
+          <option value="x">X only</option>
+          <option value="linkedin">LinkedIn only</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="context">Anything we should know? (optional)</label>
+        <textarea id="context" placeholder="e.g. this is from our panel at Stablecon; the speaker is our founder"></textarea>
+      </div>
+      <button class="btn" id="go">Make the copy</button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="out" id="out"></div>
+  </div>
+
+<script>
+// Public demo bucket (no auth). Uploads go straight here; the app reads back the public URL.
+const BUCKET_BASE = "https://storage.googleapis.com/tbmc-hackathon-082026-anna";
+
+const $ = (id) => document.getElementById(id);
+function setStatus(m, err){ const s=$("status"); s.textContent=m||""; s.className="status"+(err?" err":""); }
+function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":s; return d.innerHTML; }
+
+function uniqueName(original){
+  const safe = String(original || "clip").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
+  const uuid = (crypto.randomUUID && crypto.randomUUID()) || String(Math.random()).slice(2);
+  return `uploads/${Date.now()}-${uuid}-${safe}`;
+}
+
+$("go").addEventListener("click", async () => {
+  const f = $("file").files[0];
+  if (!f) { setStatus("Pick a clip first.", true); return; }
+  const channel = $("channel").value;
+  const context = $("context").value.trim();
+  $("go").disabled = true; $("out").innerHTML = "";
+
+  try {
+    // 1) upload straight to the public bucket with a unique (create-only) name
+    const objectName = uniqueName(f.name);
+    const publicUrl = `${BUCKET_BASE}/${objectName}`;
+    setStatus("Uploading the clip…");
+    const put = await fetch(publicUrl, {
+      method:"PUT",
+      headers:{ "Content-Type": f.type || "application/octet-stream" },
+      body: f
+    });
+    if (!put.ok) throw new Error("Upload to storage failed (" + put.status + ").");
+
+    // 2) hand the public URL to our function to transcribe + write copy
+    setStatus("Transcribing and writing copy… this can take a moment.");
+    const genRes = await fetch("/api/generate", {
+      method:"POST", headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ fileUrl: publicUrl, contentType: f.type, channel, context })
+    });
+    const data = await genRes.json();
+    if (!genRes.ok) throw new Error(data.error || "Generation failed.");
+
+    render(data);
+    setStatus("");
+  } catch (e) {
+    setStatus(e.message || "Something went wrong.", true);
+  } finally {
+    $("go").disabled = false;
+  }
+});
+
+function render(d){
+  let html = "";
+  if (d.approval && d.approval.trim())
+    html += '<div class="flag">⚠ Needs sign-off: ' + esc(d.approval) + '</div>';
+  if (Array.isArray(d.x) && d.x.length)
+    html += '<div class="block"><h3>X</h3>' + d.x.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
+  if (Array.isArray(d.linkedin) && d.linkedin.length)
+    html += '<div class="block"><h3>LinkedIn</h3>' + d.linkedin.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
+  if (Array.isArray(d.pull_quotes) && d.pull_quotes.length)
+    html += '<div class="block pull"><h3>Pull quotes</h3>' + d.pull_quotes.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
+  if (d.notes) html += '<p class="muted">'+esc(d.notes)+'</p>';
+  if (d.transcript) html += '<details style="margin-top:14px"><summary class="muted">View transcript</summary><div class="opt">'+esc(d.transcript)+'</div></details>';
+  $("out").innerHTML = html || '<p class="muted">No copy came back. Try another clip.</p>';
+}
+</script>
+</body>
+</html>

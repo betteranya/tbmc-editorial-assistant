@@ -96,7 +96,7 @@ TRANSCRIPT:
 ${transcript}`;
 
     const msg = await anthropic.messages.create({
-      model: CLAUDE_MODEL, max_tokens: 2000, system,
+      model: CLAUDE_MODEL, max_tokens: 3500, system,
       messages: [{ role: "user", content: user }]
     });
     const text = (msg.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();

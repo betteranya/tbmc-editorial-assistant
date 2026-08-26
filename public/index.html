@@ -3,139 +3,1476 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Clip to social · TBMC</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400..600&family=Instrument+Sans:wght@400..600&display=swap');
-  :root {
-    --green-1:#0A1C1E; --green-2:#003331; --green-3:#035956; --green-4:#435C5B;
-    --gold:#D49625; --beige-3:#F8F8F6; --beige-2:#F2EBE2; --beige-1:#CFBCA5; --white:#fff;
-    --ink:var(--green-1); --paper:var(--beige-3); --rule:var(--beige-2);
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--paper); color:var(--ink);
-    font-family:'Instrument Sans',-apple-system,sans-serif; line-height:1.5; }
-  .wrap { max-width:760px; margin:0 auto; padding:44px 22px 80px; }
-  h1 { font-family:'Lora',Georgia,serif; font-size:30px; font-weight:600; letter-spacing:-.015em; margin:0; }
-  .sub { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--green-4); margin:5px 0 0; }
-  .card { background:var(--white); border:1px solid var(--rule); border-radius:6px; padding:22px; margin-top:26px;
-    box-shadow:0 2px 10px rgba(10,28,30,.05); }
-  label { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.11em; color:var(--green-4); margin:0 0 6px; }
-  .row { margin-bottom:16px; }
-  input[type=file], select, textarea, input[type=text] {
-    width:100%; font-family:inherit; font-size:14px; padding:11px 12px; border:1px solid var(--rule);
-    border-radius:4px; background:var(--paper); color:var(--ink); }
-  textarea { min-height:70px; resize:vertical; }
-  .btn { font-family:inherit; font-size:13px; text-transform:uppercase; letter-spacing:.07em;
-    background:var(--green-3); color:var(--paper); border:none; border-radius:4px; padding:13px 26px; cursor:pointer; }
-  .btn:hover:not(:disabled){ background:var(--green-2); }
-  .btn:disabled { background:var(--rule); color:var(--green-4); cursor:wait; }
-  .status { font-size:13px; color:var(--green-3); margin-top:16px; min-height:20px; }
-  .status.err { color:#9A3B2E; }
-  .out { margin-top:26px; }
-  .block { background:var(--white); border:1px solid var(--rule); border-left:3px solid var(--green-3);
-    border-radius:0 5px 5px 0; padding:16px 18px; margin-bottom:14px; }
-  .block h3 { font-family:'Lora',serif; font-size:14px; margin:0 0 10px; text-transform:uppercase; letter-spacing:.04em; color:var(--green-4); }
-  .opt { font-size:14.5px; white-space:pre-wrap; padding:10px 0; border-top:1px dashed var(--rule); }
-  .opt:first-of-type { border-top:none; }
-  .pull { border-left-color:var(--gold); }
-  .flag { background:#FBF4E6; border:1px solid var(--gold); border-radius:4px; padding:12px 15px; font-size:13.5px; margin-bottom:14px; }
-  .muted { color:var(--green-4); font-size:13px; }
-</style>
+<title>Content clearing desk · TBMC</title>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Clip to social</h1>
-    <p class="sub">TBMC · drop a clip, get on-brand copy</p>
+<!--
+TBMC Content clearing desk
+Design system pulled directly from the TBMC brand book:
+- Colors: deep greens (#0A1C1E, #003331, #035956, #435C5B), gold accent (#D49625),
+  warm neutrals (#F8F8F6, #F2EBE2, #CFBCA5). Light theme, gold as the single point of energy.
+- Type: Lora (headings, serif heritage) + Instrument Sans (everything else). No monospace.
+- Motif: the mark is "a sphere defined by four directional forces" — the par line echoes that
+  sense of two sides reconciling through infrastructure.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 
-    <div class="card">
-      <div class="row">
-        <label for="file">Audio or video clip</label>
-        <input type="file" id="file" accept="audio/*,video/*" />
+  :root {
+    /* brand-book palette */
+    --green-1: #0A1C1E;   /* darkest: primary text, borders */
+    --green-2: #003331;   /* dark backgrounds, pills */
+    --green-3: #035956;   /* dark UI surfaces, hover */
+    --green-4: #435C5B;   /* muted text, secondary labels */
+    --gold:    #D49625;   /* brand accent, the single point of energy */
+    --beige-3: #F8F8F6;   /* light backgrounds, cards */
+    --beige-2: #F2EBE2;   /* borders, dividers, sections */
+    --beige-1: #CFBCA5;   /* warm neutral, decorative */
+    --white:   #FFFFFF;
+
+    /* semantic aliases mapped onto the brand palette */
+    --ink: var(--green-1);
+    --paper: var(--beige-3);
+    --ledger-green: var(--green-3);
+    --ledger-green-2: var(--green-2);
+    --par: var(--gold);
+    --par-soft: #F3E4C6;      /* soft gold wash for fills, tuned to sit under --gold */
+    --rule: var(--beige-2);
+    --card: var(--white);
+    --slate: var(--green-4);
+    --flag-bg: #FBF4E6;       /* faint gold-tinted surface for flags */
+    --clear: var(--green-3);
+    --err: #9A3B2E;
+    --shadow: 0 1px 0 rgba(10,28,30,0.03), 0 2px 10px rgba(10,28,30,0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  .ea {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 28px 64px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Masthead ---- */
+  .ea-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    flex-wrap: wrap;
+  }
+  .ea-top-left { display: flex; align-items: center; gap: 14px; }
+
+  /* the real TBMC mark: placed clean, never distorted; only a soft fade-in on load */
+  .ea-mark { display: inline-flex; flex: none; animation: mk-in 0.6s ease both; }
+  .ea-mark svg { display: block; }
+  @keyframes mk-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .ea-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0;
+    line-height: 1.05;
+  }
+  .ea-title .amp { color: var(--ledger-green); font-style: italic; }
+  .ea-sub {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--slate);
+    margin: 4px 0 0;
+  }
+  .ea-par-badge {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ledger-green);
+    border: 1px solid var(--ledger-green);
+    border-radius: 2px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    background: var(--card);
+  }
+
+  /* ---- Mode tabs ---- */
+  .ea-modes {
+    display: flex;
+    gap: 0;
+    margin: 28px 0 8px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    width: fit-content;
+    background: var(--card);
+  }
+  .ea-mode {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 11px 20px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--rule);
+    color: var(--slate);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ea-mode:last-child { border-right: none; }
+  .ea-mode[aria-selected="true"] {
+    background: var(--ledger-green);
+    color: var(--paper);
+    font-weight: 500;
+  }
+  .ea-mode:focus-visible { outline: 2px solid var(--par); outline-offset: -2px; }
+
+  .ea-panel { display: none; margin-top: 24px; }
+  .ea-panel.on { display: block; }
+
+  /* ---- Controls row ---- */
+  .ea-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .ea-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ea-field label {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--slate);
+  }
+  select, .ea-select {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  input[type="file"] {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--card);
+    color: var(--ink);
+    max-width: 320px;
+  }
+  input[type="file"]::file-selector-button {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 5px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  select:focus-visible { outline: 2px solid var(--ledger-green); outline-offset: 1px; }
+
+  textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 16px 18px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    color: var(--ink);
+    resize: vertical;
+    box-shadow: var(--shadow);
+  }
+  textarea:focus-visible { outline: 2px solid var(--ledger-green); outline-offset: 1px; }
+
+  .ea-hint {
+    font-size: 12.5px;
+    color: var(--slate);
+    margin: 8px 2px 18px;
+    line-height: 1.45;
+  }
+
+  /* conversational intro above the box */
+  .ea-intro {
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.5;
+    margin: 0 2px 12px;
+  }
+  .ea-intro .lede { font-weight: 600; }
+
+  /* collapsible "what does it check" */
+  .ea-what {
+    margin: 0 0 16px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .ea-what > summary {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ledger-green);
+    padding: 11px 14px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .ea-what > summary::-webkit-details-marker { display: none; }
+  .ea-what > summary::before {
+    content: "+";
+    font-size: 15px;
+    line-height: 1;
+    color: var(--par);
+    transition: transform 0.15s;
+  }
+  .ea-what[open] > summary::before { content: "–"; }
+  .ea-what > summary:focus-visible { outline: 2px solid var(--par); outline-offset: -2px; }
+  .ea-what-body {
+    padding: 4px 16px 16px;
+    border-top: 1px solid var(--rule);
+  }
+  .ea-what-body h5 {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--slate);
+    margin: 14px 0 6px;
+  }
+  .ea-what-body ul { margin: 0; padding-left: 18px; }
+  .ea-what-body li { font-size: 13.5px; line-height: 1.5; margin-bottom: 5px; color: var(--ink); }
+  .ea-what-body li b { font-weight: 600; }
+
+  .ea-run {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--ledger-green);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    padding: 13px 26px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.15s, transform 0.12s ease, box-shadow 0.15s;
+  }
+  .ea-run:hover:not(:disabled) {
+    background: var(--ledger-green-2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(3,89,86,0.28);
+  }
+  .ea-run:active:not(:disabled) { transform: translateY(0); }
+  /* a gold gleam sweeps across on hover */
+  .ea-run::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(212,150,37,0.35), transparent);
+    transform: skewX(-18deg); transition: left 0.5s ease;
+  }
+  .ea-run:hover:not(:disabled)::after { left: 130%; }
+  .ea-run:disabled { background: var(--rule); color: var(--slate); cursor: wait; }
+  .ea-run:disabled::after { display: none; }
+  .ea-run:focus-visible { outline: 2px solid var(--par); outline-offset: 2px; }
+
+  /* ---- The par-line ledger (signature) ---- */
+  .ledger {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .ledger-col { min-width: 0; }
+  .ledger-head {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--slate);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .ledger-in .ledger-head { color: var(--slate); }
+  .ledger-out .ledger-head { color: var(--ledger-green); }
+
+  /* the par line itself */
+  .par-line {
+    width: 44px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .par-line::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom, var(--par) 0 5px, transparent 5px 11px
+    );
+    background-size: 2px 16px;
+    transform: translateX(-1px);
+    opacity: 0.75;
+    animation: par-flow 1.1s linear infinite;
+    animation-play-state: paused;
+  }
+  .ledger.clearing .par-line::before { animation-play-state: running; opacity: 1; }
+  @keyframes par-flow { to { background-position: 0 16px; } }
+  .par-mark {
+    position: relative;
+    z-index: 1;
+    background: var(--paper);
+    color: var(--par);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    padding: 8px 4px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: transform 0.3s ease;
+  }
+  .ledger.clearing .par-mark { transform: scale(1.08); }
+
+  .ledger-body {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 14.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    color: var(--ink);
+  }
+  .ledger-in .ledger-body { color: var(--slate); }
+
+  .cleared-copy {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--clear);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .ledger-out .cleared-copy { animation: reveal 0.5s ease both; }
+  @keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* diff highlighting inside cleared copy — each change gives a little gold pop */
+  .chg {
+    background: var(--par-soft); border-radius: 2px; padding: 0 2px;
+    animation: chg-pop 0.5s ease both;
+  }
+  @keyframes chg-pop {
+    0% { background: var(--gold); color: #fff; }
+    100% { background: var(--par-soft); color: inherit; }
+  }
+
+  /* ---- Flags settled at the par line ---- */
+  .flags-zone { margin-top: 40px; }
+  .flags-title {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .flags-count {
+    color: var(--par);
+    font-size: 12px;
+  }
+
+  .flag {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--rule);
+    background: var(--card);
+    animation: settle 0.45s cubic-bezier(.2,.7,.3,1) both;
+  }
+  /* flags settle in one after another, like line items clearing */
+  .flag:nth-child(2) { animation-delay: .06s; }
+  .flag:nth-child(3) { animation-delay: .12s; }
+  .flag:nth-child(4) { animation-delay: .18s; }
+  .flag:nth-child(5) { animation-delay: .24s; }
+  .flag:nth-child(6) { animation-delay: .30s; }
+  .flag:nth-child(n+7) { animation-delay: .36s; }
+  @keyframes settle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .flag-cat {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 14px 12px;
+    background: var(--flag-bg);
+    color: var(--par);
+    border-right: 2px solid var(--par);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .flag-sev {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--slate);
+  }
+  .flag-sev.review { color: var(--err); }
+  .flag-body { padding: 14px 16px; }
+  .flag-quote {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--slate);
+    margin-bottom: 6px;
+  }
+  .flag-quote::before { content: "“"; }
+  .flag-quote::after { content: "”"; }
+  .flag-fix { font-size: 14px; color: var(--ink); }
+
+  .approval {
+    margin-top: 22px;
+    border: 1px solid var(--par);
+    background: var(--flag-bg);
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .approval-icon {
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--par);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  /* routine review reads calm (green), heavy sign-off keeps the gold alert */
+  .approval.light {
+    border-color: var(--green-3);
+    background: #EEF3F1;
+  }
+  .approval.light .approval-icon { color: var(--green-3); }
+
+  /* ---- Ideas ---- */
+  .idea {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .idea-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .idea-tag {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .idea-tag.type { background: var(--ledger-green); color: var(--paper); }
+  .idea-tag.pillar { background: var(--par-soft); color: #6E5717; }
+  .idea-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .idea-desc { font-size: 14px; margin: 0 0 10px; }
+  .idea-angle {
+    font-size: 13px;
+    color: var(--slate);
+    border-top: 1px dashed var(--rule);
+    padding-top: 10px;
+  }
+  .idea-angle b {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ledger-green);
+    font-weight: 600;
+  }
+
+  /* ---- transform side-by-side ---- */
+  .xform { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .xform-col { background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .xform-col h4 {
+    font-family: 'Instrument Sans', sans-serif; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--ledger-green); margin: 0 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .xform-body { font-family: 'Lora', Georgia, serif; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+
+  /* ---- status / loading ---- */
+  .status {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12.5px;
+    color: var(--ledger-green);
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--par);
+    animation: pulse 1.1s ease-in-out infinite;
+  }
+  .status .status-msg { transition: opacity 0.18s ease; }
+  @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.15)} }
+  .status.err { color: var(--err); }
+  .status.err .dot { background: var(--err); animation: none; }
+
+  .empty {
+    color: var(--slate); font-size: 13.5px; font-style: italic;
+    padding: 18px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status .dot,
+    .ea-mark,
+    .par-line::before, .cleared-copy, .chg, .flag { animation: none !important; }
+    .ea-run::after { display: none; }
+    .ea-run:hover:not(:disabled) { transform: none; }
+  }
+  @media (max-width: 720px) {
+    .ledger { grid-template-columns: 1fr; }
+    .par-line { width: 100%; height: 34px; flex-direction: row; }
+    .par-line::before { top: 50%; left: 0; right: 0; bottom: auto; width: auto; height: 1px;
+      background: repeating-linear-gradient(to right, var(--par) 0 5px, transparent 5px 11px); }
+    .par-mark { writing-mode: horizontal-tb; }
+    .ledger-out { margin-top: 14px; }
+    .xform { grid-template-columns: 1fr; }
+    .flag { grid-template-columns: 1fr; }
+    .flag-cat { flex-direction: row; justify-content: space-between; border-right: none; border-bottom: 2px solid var(--par); }
+  }
+  /* ---- engraved empty state (a pen writing, intaglio style) ---- */
+  .ea-emptyhero {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 0 8px;
+    animation: mk-in 0.7s ease both;
+  }
+  .ea-emptyhero svg { display: block; overflow: visible; }
+
+  /* the ink line draws itself in, then resets and writes again */
+  .ink-stroke {
+    stroke-dasharray: 360;
+    stroke-dashoffset: 360;
+    animation: write-ink 4.5s ease-in-out infinite;
+  }
+  @keyframes write-ink {
+    0%   { stroke-dashoffset: 360; }
+    45%  { stroke-dashoffset: 0; }
+    70%  { stroke-dashoffset: 0; opacity: 1; }
+    85%  { opacity: 0; }
+    86%  { stroke-dashoffset: 360; opacity: 0; }
+    100% { stroke-dashoffset: 360; opacity: 1; }
+  }
+  /* the pen glides left-to-right along the writing line, matching the ink */
+  .pen {
+    animation: write-move 4.5s ease-in-out infinite;
+    transform-origin: 120px 150px;
+  }
+  @keyframes write-move {
+    0%   { transform: translate(-70px, 4px); }
+    45%  { transform: translate(88px, -2px); }
+    70%  { transform: translate(88px, -2px); }
+    72%  { transform: translate(88px, -14px); }   /* lift off the page */
+    99%  { transform: translate(-70px, -14px); }  /* return to start, still lifted */
+    100% { transform: translate(-70px, 4px); }    /* set back down */
+  }
+  .pen-tip { animation: tip-glow 4.5s ease-in-out infinite; }
+  @keyframes tip-glow { 0%,70% { opacity: 1; } 72%,100% { opacity: 0.4; } }
+
+  .ea-emptyhero .eh-cap {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--slate);
+    margin: 18px 0 0;
+  }
+  .ea-emptyhero .eh-line {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 19px;
+    color: var(--ink);
+    margin: 8px 0 0;
+    max-width: 34ch;
+    line-height: 1.35;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ea-emptyhero, .ink-stroke, .pen, .pen-tip { animation: none !important; }
+    .ink-stroke { stroke-dashoffset: 0; }
+    .pen { transform: translate(88px, -2px); }
+  }
+  /* ---- fun strips: money fact + timeline quip ---- */
+  .fun-strip {
+    margin-top: 30px;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    background: linear-gradient(180deg, #FBF4E6 0%, var(--card) 100%);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    animation: mk-in 0.6s ease both;
+  }
+  .fun-strip-label {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .fun-strip-body {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    padding-right: 76px;
+  }
+  .fun-strip-body.quote {
+    font-style: italic;
+  }
+  .fun-strip-cite {
+    font-family: 'Instrument Sans', sans-serif;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 6px;
+  }
+  .fun-strip-refresh {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 4px 9px;
+    color: var(--slate);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .fun-strip-refresh:hover { border-color: var(--gold); color: var(--gold); }
+  .fun-strip-refresh:disabled { opacity: 0.5; cursor: wait; }
+  .fun-fade { transition: opacity 0.2s ease; }
+</style>
+
+<div class="ea">
+  <div class="ea-top">
+    <div class="ea-top-left">
+      <span class="ea-mark" aria-hidden="true">
+        <svg viewBox="0 0 1080 1080" width="42" height="42" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <path d="M328.562 751.334C382.69 805.461 457.417 838.902 539.987 838.902C622.558 838.902 697.285 805.461 751.412 751.334H328.562Z" fill="var(--green-2)"/>
+          <path d="M328.605 328.598C274.477 382.725 241.035 457.451 241.035 540.02C241.035 622.589 274.477 697.316 328.605 751.442V328.598Z" fill="var(--green-2)"/>
+          <path d="M751.367 328.58V751.339C805.495 697.212 838.937 622.486 838.937 539.917C838.937 457.347 805.495 382.621 751.367 328.494V328.58Z" fill="var(--green-2)"/>
+          <path d="M751.328 328.568C697.287 274.441 622.473 241 539.989 241C457.505 241 382.692 274.441 328.564 328.568H751.328Z" fill="var(--green-2)"/>
+          <path d="M689.5 689.498C772.067 606.933 772.067 473.067 689.5 390.502C606.933 307.936 473.067 307.936 390.5 390.502C307.933 473.067 307.933 606.933 390.5 689.498C473.067 772.064 606.933 772.064 689.5 689.498Z" fill="var(--green-2)"/>
+        </svg>
+      </span>
+      <div>
+        <h1 class="ea-title">Content clearing desk</h1>
+        <p class="ea-sub">TBMC editorial assistant</p>
       </div>
-      <div class="row">
-        <label for="channel">Draft for</label>
-        <select id="channel">
+    </div>
+  </div>
+
+  <div class="ea-modes" role="tablist" aria-label="Tools">
+    <button class="ea-mode" role="tab" aria-selected="true" data-panel="check">Clear a draft</button>
+    <button class="ea-mode" role="tab" aria-selected="false" data-panel="ideas">Source ideas</button>
+    <button class="ea-mode" role="tab" aria-selected="false" data-panel="xform">X ⇄ LinkedIn</button>
+    <button class="ea-mode" role="tab" aria-selected="false" data-panel="clip">Clip to social</button>
+  </div>
+
+  <!-- ============ CHECK ============ -->
+  <div class="ea-panel on" id="panel-check" role="tabpanel">
+    <p class="ea-intro"><span class="lede">Paste a draft and the desk cleans it up.</span> It catches the things we care about in TBMC writing and hands back a corrected version, with each change explained. Not sure a change is right? Everything is laid out so you can accept or ignore it.</p>
+
+    <details class="ea-what">
+      <summary>What the desk checks</summary>
+      <div class="ea-what-body">
+        <h5>How it reads</h5>
+        <ul>
+          <li>Em dashes in moderation (flags clustering, not single uses), and no AI-sounding filler lines that add drama without saying anything new.</li>
+          <li>No coy setups like "Here's the thing." or "Why does this matter?" It rewrites those into real sentences.</li>
+          <li>Headers in sentence case, and no superlatives (best, first, only) unless we can back them up.</li>
+          <li>The right voice for the format: essays can use "you," but marketing body copy stays impersonal.</li>
+        </ul>
+        <h5>Naming and house style</h5>
+        <ul>
+          <li>Keeps our names and wording consistent, from how we write "The Better Money Company" and "clearinghouse" to the small conventions that keep copy looking like ours.</li>
+        </ul>
+        <h5>Narrative and key talking points</h5>
+        <ul>
+          <li>Checks copy against TBMC's narrative and approved talking points: how we describe the product, where we sit in the market, and how we talk about partners, positioning, and the things we can and can't claim yet.</li>
+          <li>When something runs against the narrative or needs a human eye, it flags it for review instead of quietly rewriting it.</li>
+        </ul>
+        <h5>The type of review you need</h5>
+        <ul>
+          <li>Everything gets a review before it goes out. The desk's job is to tell you <b>what kind</b> this draft needs, so you know who to loop in: a quick style pass, or a heavier sign-off for partnership news, a launch, fundraising, press, or anything legal, compliance, or regulatory.</li>
+        </ul>
+        <p style="font-size:12.5px;color:var(--slate);margin:14px 0 0;border-top:1px solid var(--rule);padding-top:12px;">The full narrative and talking-point rules live in the tool's settings and can be expanded over time as our messaging evolves.</p>
+      </div>
+    </details>
+
+    <div class="ea-controls">
+      <div class="ea-field">
+        <label for="ctype">Content type</label>
+        <select id="ctype">
+          <option value="auto">Detect automatically</option>
+          <option value="thought">Thought leadership (essay)</option>
+          <option value="explainer">Explainer</option>
+          <option value="technical">Technical deep-dive</option>
+          <option value="product">Product copy</option>
+          <option value="social-x">Social — X</option>
+          <option value="social-li">Social — LinkedIn</option>
+          <option value="blog">Blog post</option>
+        </select>
+      </div>
+    </div>
+    <textarea id="draft" placeholder="Paste a draft: blog post, social copy, explainer, product page, keynote section. Leave content type on auto and the desk will infer register from the writing."></textarea>
+    <button class="ea-run" id="run-check">Run through the desk</button>
+    <div id="check-out">
+      <div class="ea-emptyhero" id="check-empty">
+        <svg class="pen-scene" viewBox="0 0 320 220" width="240" height="165" role="img" aria-label="A pen writing a line">
+          <defs>
+            <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(22)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--green-3)" stroke-width="1"/>
+            </pattern>
+          </defs>
+
+          <!-- the written line: a gold flourish that draws itself in -->
+          <path id="ink" class="ink-stroke"
+                d="M40 168 C70 150 88 186 118 168 C148 150 168 184 198 166"
+                fill="none" stroke="var(--gold)" stroke-width="3.4" stroke-linecap="round"/>
+
+          <!-- the pen: built as a real pen with the NIB TIP at (118,168), the writing point.
+               Rotating about that same point keeps the tip on the line at any angle.
+               Proportions: slim barrel, long body, small fine nib. -->
+          <g class="pen">
+            <g transform="rotate(30 118 168)">
+              <!-- barrel + cap: slim and long -->
+              <rect x="109" y="20" width="18" height="116" rx="9"
+                    fill="var(--beige-3)" stroke="var(--green-1)" stroke-width="2.2"/>
+              <clipPath id="barrelclip"><rect x="109" y="20" width="18" height="116" rx="9"/></clipPath>
+              <g clip-path="url(#barrelclip)">
+                <rect x="119" y="20" width="8" height="116" fill="url(#hatch)" opacity="0.5"/>
+              </g>
+              <!-- cap band -->
+              <rect x="109" y="66" width="18" height="5" fill="var(--green-2)"/>
+              <!-- the clip: slim, the key "this is a pen" cue -->
+              <path d="M113 27 C113 23 122 23 122 28 L122 56 C122 58 119 58 119 56 L119 31 C119 30 116 30 116 31"
+                    fill="none" stroke="var(--green-1)" stroke-width="1.8" stroke-linejoin="round"/>
+              <!-- grip section: narrow taper below the barrel -->
+              <path d="M110 136 L126 136 L123 154 L113 154 Z"
+                    fill="var(--beige-3)" stroke="var(--green-1)" stroke-width="2"/>
+              <line x1="112" y1="142" x2="124" y2="142" stroke="var(--green-1)" stroke-width="1.2" opacity="0.55"/>
+              <line x1="113" y1="148" x2="123" y2="148" stroke="var(--green-1)" stroke-width="1.2" opacity="0.55"/>
+              <!-- nib: small and fine, tapering to the point at (118,168) -->
+              <path d="M113 154 L123 154 L118 168 Z"
+                    fill="var(--beige-3)" stroke="var(--green-1)" stroke-width="2"/>
+              <line x1="118" y1="157" x2="118" y2="166" stroke="var(--green-1)" stroke-width="1.3"/>
+            </g>
+            <!-- ink bead exactly at the pivot / writing point -->
+            <circle class="pen-tip" cx="118" cy="168" r="4.2" fill="var(--gold)"/>
+          </g>
+        </svg>
+        <p class="eh-cap">The desk is ready</p>
+        <p class="eh-line">Paste a draft above and clear it against the house style and narrative.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ IDEAS ============ -->
+  <div class="ea-panel" id="panel-ideas" role="tabpanel">
+    <p class="ea-intro"><span class="lede">Paste rough notes, get content ideas back.</span> Drop in an engineer's Slack update, a standup note, or a quick description of what someone built. The messier the better. The desk turns it into a handful of angles you can develop: internal updates, customer-facing pieces, and plain-language explainers like the at-par one.</p>
+    <textarea id="notes" placeholder="Paste raw engineering notes, a Slack thread, a standup update, a rough description of what someone built. Messy is fine, that's the point."></textarea>
+    <button class="ea-run" id="run-ideas">Generate angles</button>
+    <div id="ideas-out"></div>
+
+    <div class="fun-strip" id="factstrip">
+      <div class="fun-strip-label">Money fact of the moment</div>
+      <div class="fun-strip-body" id="fact-body"></div>
+      <button class="fun-strip-refresh" id="fact-refresh" title="New fact">New fact</button>
+    </div>
+  </div>
+
+  <!-- ============ TRANSFORM ============ -->
+  <div class="ea-panel" id="panel-xform" role="tabpanel">
+    <p class="ea-intro"><span class="lede">Rewrite a post for the other channel.</span> Paste something written for X or LinkedIn and pick a direction. The desk rewrites it to fit the other one: X gets tight numbered beats, LinkedIn gets flowing paragraphs. It keeps our conventions and won't invent partner claims that aren't already in your post.</p>
+    <div class="ea-controls">
+      <div class="ea-field">
+        <label for="xdir">Direction</label>
+        <select id="xdir">
+          <option value="x2li">X thread → LinkedIn post</option>
+          <option value="li2x">LinkedIn post → X thread</option>
+        </select>
+      </div>
+    </div>
+    <textarea id="xsrc" placeholder="Paste an X thread or a LinkedIn post here."></textarea>
+    <button class="ea-run" id="run-xform">Convert</button>
+    <div id="xform-out"></div>
+
+    <div class="fun-strip" id="quipstrip">
+      <div class="fun-strip-label">From the timeline</div>
+      <div class="fun-strip-body" id="quip-body"></div>
+      <button class="fun-strip-refresh" id="quip-next" title="Next">Next</button>
+    </div>
+  </div>
+
+  <!-- ============ CLIP TO SOCIAL ============ -->
+  <div class="ea-panel" id="panel-clip" role="tabpanel">
+    <p class="ea-intro"><span class="lede">Drop in a clip, get on-brand copy.</span> Upload audio or video, a panel moment, a founder riff, a product walkthrough. The desk transcribes it and drafts social copy from what was actually said, with pull quotes and a sign-off flag when needed.</p>
+    <div class="ea-controls">
+      <div class="ea-field">
+        <label for="clip-file">Audio or video clip</label>
+        <input type="file" id="clip-file" accept="audio/*,video/*" />
+      </div>
+      <div class="ea-field">
+        <label for="clip-channel">Draft for</label>
+        <select id="clip-channel">
           <option value="both">X and LinkedIn</option>
           <option value="x">X only</option>
           <option value="linkedin">LinkedIn only</option>
         </select>
       </div>
-      <div class="row">
-        <label for="context">Anything we should know? (optional)</label>
-        <textarea id="context" placeholder="e.g. this is from our panel at Stablecon; the speaker is our founder"></textarea>
-      </div>
-      <button class="btn" id="go">Make the copy</button>
-      <div class="status" id="status"></div>
     </div>
-
-    <div class="out" id="out"></div>
+    <textarea id="clip-context" placeholder="Anything we should know? e.g. this is from our panel at Stablecon; the speaker is our founder. (optional)" style="min-height:70px"></textarea>
+    <button class="ea-run" id="run-clip">Make the copy</button>
+    <div id="clip-out"></div>
   </div>
+</div>
 
 <script>
-// Public demo bucket (no auth). Uploads go straight here; the app reads back the public URL.
-const BUCKET_BASE = "https://storage.googleapis.com/tbmc-hackathon-082026-anna";
+(function () {
+  // ============================================================================
+  //  TBMC CRITERIA  —  EDIT THIS BLOCK TO CHANGE WHAT THE DESK CHECKS FOR
+  // ----------------------------------------------------------------------------
+  //  This single string is the tool's rulebook. To expand or update what the
+  //  desk checks after launch, edit the text inside the backticks below. No other
+  //  code needs to change. Write rules in plain English, one idea per line.
+  //
+  //  It has two kinds of rules:
+  //   - VOICE / HOUSE STYLE: how TBMC writes (the desk may imitate and apply these).
+  //   - NARRATIVE & TALKING POINTS (reference): facts, positioning, and competitor
+  //     framing the desk checks copy against but never reproduces raw in its output.
+  //
+  //  Tip: things you want flagged-for-review (not silently rewritten) should say so,
+  //  e.g. "flag X for review". Keep sensitive internal notes out of here.
+  // ============================================================================
+  const HOUSE = `
+TBMC = The Better Money Company. Never "Better Money" alone. "clearinghouse" is one word,
+lowercase except at the start of a sentence, and never capitalized after TBMC
+(correct: "TBMC clearinghouse"). "stablecoins" is lowercase mid-sentence, capitalized in titles.
 
-const $ = (id) => document.getElementById(id);
-function setStatus(m, err){ const s=$("status"); s.textContent=m||""; s.className="status"+(err?" err":""); }
-function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":s; return d.innerHTML; }
+HOUSE STYLE (voice layer):
+- Em dashes are allowed. The problem is density, not the mark: flag more than two in one
+  sentence, and flag clustering (several sentences in a row leaning on dash asides). Do not
+  swap them for colons just to avoid the mark; use whatever punctuation reads best aloud.
+- No AI-slop filler short sentences: standalone one-liners that only add drama and restate
+  what was just said ("That's the point." "It's that simple." "This changes everything.").
+  KEEP load-bearing short sentences that carry a real claim ("Stablecoins are a complementary good."
+  "Freezing is a feature.").
+- Watch for AI-cadence rhythm across the whole piece, not just single sentences. These patterns read
+  as machine-generated once they recur, so flag them when they cluster (a couple across a long piece
+  is fine): polished antithesis closers ("exact when it's cheap; fast and approximate when it isn't"),
+  fragment-as-emphasis triplets ("Same solver. Bigger graph. No scheduler."), and "not X, but Y" /
+  "not X. It is Y." reversals used repeatedly. Suggest plainer, less symmetrical prose. This applies
+  to all content types and is enforced most aggressively on technical deep-dives.
+- No coy question-fragment or one-word setup transitions ("And honestly?" "Here's the thing."
+  "The result?" "Why does this matter?"). Rewrite into real prose.
+- No unearned superlatives (best/first/only/most) unless provably true and specific.
+- Headers: sentence case, capitalize only the first word, rest lowercase (proper nouns excepted).
+- Specificity: prefer concrete numbers, named quotes, dates over vague claims.
+- Partner-first framing; use "building with" not "announcing" for unsigned partnerships.
 
-function uniqueName(original){
-  const safe = String(original || "clip").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60);
-  const uuid = (crypto.randomUUID && crypto.randomUUID()) || String(Math.random()).slice(2);
-  return `uploads/${Date.now()}-${uuid}-${safe}`;
-}
+REGISTER BY CONTENT TYPE:
+- Thought leadership (essays, by any author): first and second person allowed; one controlling
+  metaphor welcome; one or two dry asides are in-voice, not filler; banking/platform-strategy
+  analogies fit. Recurring house devices in this register: banking-history analogies, "commoditize
+  your complements" (Joel Spolsky), "makes your beer taste better," the Five Bells clearinghouse
+  story. Apply the register to the writing itself; do not assume the author is a founder.
+- Explainer (plain-language pieces that unpack one concept; the at-par piece is the model example):
+  question headers; define the term plainly with a concrete numeric example up front; anchor in a
+  physical transaction (e.g. farm/grocery, wire transfer); distinguish commonly-conflated terms
+  head-on; put TBMC's mechanism last. Direct address ("you") is allowed here as a teaching device.
+- Technical deep-dive (long-form engineering pieces explaining how something was built, e.g. the
+  settlement-router post): the substance can be dense and precise, and real technical vocabulary,
+  math, and structure are welcome. The failure mode here is AI CADENCE, not accuracy, and it must be
+  flagged aggressively. Flag these patterns even when each instance reads well, because they cluster:
+    * Polished antithesis closers ("It's exact when it's cheap; fast and approximate when it isn't.",
+      "Locally cheap is not globally cheap.", "Deciding and doing are different jobs.") — one or two
+      across a whole piece is fine; flag them once they recur as a rhythm.
+    * Fragment-as-emphasis triplets ("Same solver. Bigger graph. No scheduler was invented.",
+      "Cheap enough to re-plan every window. Cheap enough to re-plan after every failure.").
+    * "Not X, but Y" / "not X. It is Y." reversals used repeatedly ("not a directions problem. It is
+      flow.", "built like an instrument, not a service.").
+    * Section-closing aphorisms that restate the point in a quotable line (the "drumming" pattern).
+    * Title/ending bookends that repeat a clever line ("...So we solved it.").
+  Recommend replacing clustered instances with plainer, less symmetrical prose; human technical
+  writing has uneven texture, some long unspooling explanations and some genuinely flat sentences
+  that are not trying to land a beat. Keep the load-bearing lines; cut the ones that only add rhythm.
+- Product copy (solutions pages, product pages, feature and integration copy, one-pagers):
+  impersonal body voice, no "you/your" except in headlines; sentence-case benefit titles followed
+  by one clause; problem stated plainly before TBMC appears. These conventions come from the
+  solutions page but apply to product copy generally.
+- Social X: tight; rhetorical-flip hooks ("You don't sell your Wells Fargo dollars to buy Bank of
+  America dollars. So why do we treat stablecoins that way?"); numbered "1/ 2/" for threads;
+  individual partner handles; one emoji max, never rockets; no hashtags except partner tags.
+- Social LinkedIn: flowing paragraphs, slightly more formal but human; spell out abbreviations on
+  first use; same substance as X, different register.
 
-$("go").addEventListener("click", async () => {
-  const f = $("file").files[0];
-  if (!f) { setStatus("Pick a clip first.", true); return; }
-  const channel = $("channel").value;
-  const context = $("context").value.trim();
-  $("go").disabled = true; $("out").innerHTML = "";
+AI-TELL TAXONOMY (deeper editorial cues; apply to all content types, enforced hardest on long-form):
+- Insight-shaped filler: sentences that sound weighty but do not survive paraphrase ("Something real
+  is happening", "The stakes couldn't be higher", "We're at an inflection point", "the next chapter
+  of our journey", "We're excited to announce"). Test: paraphrase it; if it reduces to "stuff exists"
+  or "things are changing", cut it.
+- Empty contrasts: "It's not just about X, it's about Y" where Y is fuzzier than X. Sharpen Y or
+  delete the "not just about" clause and get to the point.
+- Hedges: "in many ways", "at some level", "arguably" exist to make a sentence impossible to be wrong
+  about. Cut them, EXCEPT load-bearing compliance hedges: TBMC operates in a regulated space, and
+  hedges that soften legal, licensing, or financial claims are required and must stay.
+- Fungibility test (voice): if a sentence could be transplanted into a stranger's essay on another
+  topic unchanged, rework it. Watch for: abstract nouns doing no work (efficiency, innovation,
+  complexity), insipid dynamism (navigate, leverage, unlock, foster, empower, elevate, streamline),
+  beacon-phrases ("a testament to", "stands as a beacon of", "serves as a reminder that"), vague
+  gesture words (landscape, journey, tapestry; "ecosystem" only when nothing more specific exists),
+  vague intensifiers ("very important", "significant impact") with nothing concrete behind them, and
+  generic hold-message warmth ("Great question!").
+- Specificity fix: replace vague claims with concrete actors and actions ("the ecosystem is
+  expanding" becomes "developers are building more wallets, exchanges, and lending markets").
+- Structural tells: over-organization (subheads, bullets, and mini-frameworks where prose should
+  flow), section previews ("there are three key reasons"), needless signposting ("First", "In
+  conclusion", "Let's unpack this"), a bold lead-in on every bullet, forced groups of three, punchy
+  fragments in threes, formulaic openings ("In today's rapidly changing world"), and endings that
+  merely restate or moralize ("what we can learn"). Structure is welcome where the format expects it
+  (explainers, docs, reference and skim content); flag it in essays and narrative pieces.
+- Punctuation sameness: consecutive colon-then-list sentences, clustered dash asides, performative
+  semicolons, every sentence the same shape. Recommend reading aloud. NOTE: the house rule is
+  Em dash guidance follows this taxonomy: moderation and density, not a ban.
 
-  try {
-    // 1) upload straight to the public bucket with a unique (create-only) name
-    const objectName = uniqueName(f.name);
-    const publicUrl = `${BUCKET_BASE}/${objectName}`;
-    setStatus("Uploading the clip…");
-    const put = await fetch(publicUrl, {
-      method:"PUT",
-      headers:{ "Content-Type": f.type || "application/octet-stream" },
-      body: f
+PRODUCT ACCURACY (reference layer — use to check, don't paste raw):
+- TBMC runs a clearinghouse. It mints and redeems on the issuer's behalf. It does NOT issue
+  stablecoins itself.
+- Mechanism is mint-and-redeem via direct issuer relationships, NOT trading/market-based swapping.
+  Flag any copy implying market execution, slippage-based conversion, or AMM/DEX/market-maker
+  mechanics as TBMC's method.
+- Settles at par ($1 in = $1 out), predictable/guaranteed settlement times, no slippage.
+- Clears on a fixed settlement schedule. Public copy stays vague on exact windows — do NOT insert
+  specific clock times (e.g. 11am/4pm/7pm ET) into customer-facing copy.
+- "swap"/"swappable" are approved verbs. "exchange" as a NOUN labeling TBMC is prohibited (also a
+  legal line: TBMC is not an exchange). Flag "exchange" for human review rather than silently rewriting.
+- GENIUS-compliant stablecoins only. USDT is excluded; USAT (its US version) is included. Asset
+  lists vary across internal docs, so treat any specific asset list as "verify against current
+  canonical list" rather than asserting one.
+- Approved lines: "issuers integrate once, reach a network of builders; builders integrate once,
+  accept every supported stablecoin"; "many-to-many into many-to-one"; "a neutral intermediary that
+  makes sure when you send one thing, you reliably get another."
+
+POSITIONING ACCURACY (reference layer — check copy against these, don't paste raw):
+- Not anti-fiat / not anti-bank. The goal is the singleness of money: stablecoins interchangeable
+  with each other AND with bank dollars, deposit tokens, and fiat. TBMC is NOT building for a world
+  where fiat disappears; it operates alongside existing financial infrastructure. Flag copy that
+  frames TBMC as replacing, beating, or competing with banks or fiat.
+- Horizontal, not vertical. TBMC connects many stablecoins across many chains through a single
+  integration; it is NOT an on/off-ramp play. Companies like Stripe, Coinbase, and Visa did strong
+  work on ramps (they went vertical) and are framed as peers/potential partners, never shaded — this
+  is the one context where naming those companies positively is fine.
+- Infrastructure, not crypto. Lean to financial-infrastructure / payments framing; stablecoins and
+  blockchain are "just the rails." Flag copy that positions TBMC primarily as a crypto company.
+- Funds provenance (specific, checkable claim): every dollar in the clearinghouse comes from issuers
+  that are OCC trust charters, GENIUS-regulated institutions, or KYB-verified businesses. Flag copy
+  that contradicts or overstates this.
+- Licensing status is specific and easy to overstate: TBMC is PURSUING money transmitter licenses
+  nationally, plus the DFAL license (California) and BitLicense (New York), and works with BitGo on
+  licensing today. Flag any copy claiming TBMC is already fully licensed or a licensed money
+  transmitter — mark it "review".
+- "Why many stablecoins" thesis: institutions launch their own for brand, economics, and compliance;
+  TBMC expects thousands of issuers (like the 4,000+ US banks), not one winner. Flag copy predicting
+  a single stablecoin will "win" as off-thesis.
+
+COMPETITOR FRAMING (reference layer):
+- In social copy: never name or shade competitors.
+- In interview/press/thought-leadership register only, these approved contrasts exist: Ubyx (helps
+  banks redeem stablecoins for fiat; TBMC converts between stablecoins), BVNK (payments platform;
+  TBMC is the conversion layer underneath, a potential partner), market makers like Wintermute/B2C2
+  (supply-demand pricing; TBMC is at-par, guaranteed), issuers like Bridge/Circle (their own coin/chain;
+  TBMC is neutral, coin- and chain-agnostic). Never surface internal research names or coaching notes.
+
+REVIEW ROUTING: every corporate draft gets reviewed before publishing, so do not just say "needs
+review". Instead classify the LEVEL and route it. Use "light" for a routine style/copy pass with no
+sensitive content. Use "heavy" when the draft touches a sign-off category (partnership announcement,
+product launch/feature, fundraising/financial info, press/media statement, legal/compliance/regulatory,
+crisis response); name which category and who should sign off. Always return a review classification.
+`;
+
+  async function callClaude(system, user, maxTokens) {
+    // When deployed (Vercel), route through our server proxy which holds the API key.
+    // In preview/artifact contexts the proxy doesn't exist, so fall back to the direct call.
+    try {
+      const p = await fetch('/api/claude', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system, user, maxTokens: maxTokens || 1500 })
+      });
+      if (p.ok) {
+        const j = await p.json();
+        const cleaned = String(j.text || '').replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+        return JSON.parse(cleaned);
+      }
+    } catch (_) { /* no proxy here; fall through to direct */ }
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: maxTokens || 1500,
+        system: system,
+        messages: [{ role: 'user', content: user }]
+      })
     });
-    if (!put.ok) throw new Error("Upload to storage failed (" + put.status + ").");
-
-    // 2) hand the public URL to our function to transcribe + write copy
-    setStatus("Transcribing and writing copy… this can take a moment.");
-    const genRes = await fetch("/api/generate", {
-      method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ fileUrl: publicUrl, contentType: f.type, channel, context })
-    });
-    const data = await genRes.json();
-    if (!genRes.ok) throw new Error(data.error || "Generation failed.");
-
-    render(data);
-    setStatus("");
-  } catch (e) {
-    setStatus(e.message || "Something went wrong.", true);
-  } finally {
-    $("go").disabled = false;
+    if (!res.ok) throw new Error('api ' + res.status);
+    const data = await res.json();
+    const text = (data.content || [])
+      .filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+    return JSON.parse(cleaned);
   }
-});
 
-function render(d){
-  let html = "";
-  if (d.approval && d.approval.trim())
-    html += '<div class="flag">⚠ Needs sign-off: ' + esc(d.approval) + '</div>';
-  if (Array.isArray(d.x) && d.x.length)
-    html += '<div class="block"><h3>X</h3>' + d.x.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
-  if (Array.isArray(d.linkedin) && d.linkedin.length)
-    html += '<div class="block"><h3>LinkedIn</h3>' + d.linkedin.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
-  if (Array.isArray(d.pull_quotes) && d.pull_quotes.length)
-    html += '<div class="block pull"><h3>Pull quotes</h3>' + d.pull_quotes.map(p=>'<div class="opt">'+esc(p)+'</div>').join("") + '</div>';
-  if (d.notes) html += '<p class="muted">'+esc(d.notes)+'</p>';
-  if (d.transcript) html += '<details style="margin-top:14px"><summary class="muted">View transcript</summary><div class="opt">'+esc(d.transcript)+'</div></details>';
-  $("out").innerHTML = html || '<p class="muted">No copy came back. Try another clip.</p>';
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+
+  // render cleared copy with <<...>> change markers turned into highlights
+  function renderChanges(s) {
+    return esc(s).replace(/&lt;&lt;(.+?)&gt;&gt;/g, '<span class="chg">$1</span>');
+  }
+
+  // ---------- tab switching ----------
+  const modes = [...document.querySelectorAll('.ea-mode')];
+  const panels = {
+    check: document.getElementById('panel-check'),
+    ideas: document.getElementById('panel-ideas'),
+    xform: document.getElementById('panel-xform'),
+    clip: document.getElementById('panel-clip')
+  };
+  modes.forEach(m => m.addEventListener('click', () => {
+    modes.forEach(x => x.setAttribute('aria-selected', 'false'));
+    m.setAttribute('aria-selected', 'true');
+    Object.values(panels).forEach(p => p.classList.remove('on'));
+    panels[m.dataset.panel].classList.add('on');
+  }));
+
+  let statusTimer = null;
+  function setStatus(el, msg, isErr) {
+    if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+    el.innerHTML = '<div class="status' + (isErr ? ' err' : '') + '"><span class="dot"></span><span class="status-msg">' + esc(msg) + '</span></div>';
+  }
+  // rotate through playful, clearing-themed messages while we wait
+  function setLoading(el, messages) {
+    setStatus(el, messages[0]);
+    const msgEl = el.querySelector('.status-msg');
+    let i = 0;
+    statusTimer = setInterval(() => {
+      i = (i + 1) % messages.length;
+      if (msgEl) { msgEl.style.opacity = 0; setTimeout(() => { msgEl.textContent = messages[i]; msgEl.style.opacity = 1; }, 180); }
+    }, 1600);
+  }
+  const CLEARING_MSGS = [
+    'Opening the clearing desk…',
+    'Reconciling against house style…',
+    'Checking the narrative and talking points…',
+    'Settling the flags at the par line…',
+    'Balancing the books…'
+  ];
+
+  // ================= CHECK =================
+  const checkBtn = document.getElementById('run-check');
+  const checkOut = document.getElementById('check-out');
+  checkBtn.addEventListener('click', async () => {
+    const draft = document.getElementById('draft').value.trim();
+    if (!draft) return;
+    const ctype = document.getElementById('ctype').value;
+    checkBtn.disabled = true;
+    setLoading(checkOut, CLEARING_MSGS);
+
+    const sys = HOUSE + `
+
+You are the clearing desk: TBMC's editorial checker. Clear the draft.
+The stated content type is: ${ctype === 'auto' ? 'not specified — infer it from the writing and say which you inferred' : ctype}.
+Apply the register rules for that type. In "clean_copy", wrap each substantive change inline in
+<<double angle brackets>> so edits can be highlighted (only wrap the changed words, not whole paragraphs).
+
+Respond ONLY with JSON, no markdown fences:
+{
+  "detected_type": "the content type you applied",
+  "clean_copy": "the corrected draft, with <<changed spans>> marked",
+  "flags": [
+    { "category": "short label e.g. 'Em dash clustering' / 'AI filler' / 'Product accuracy' / 'Header case' / 'Exchange (review)' / 'Superlative'",
+      "severity": "fix | review",
+      "quote": "the exact original phrase, under 12 words",
+      "fix": "one-sentence explanation of the correction or why it needs review" }
+  ],
+  "review_level": "light | heavy",
+  "review_note": "one sentence: for 'light', a routine style/copy pass; for 'heavy', name the category and who should sign off"
 }
+Use severity "review" (not "fix") for anything you should not silently rewrite: the word "exchange"
+labeling TBMC, specific asset lists, competitor mentions, and anything touching a sign-off category.
+Always return review_level and review_note. If the draft is clean, return it unchanged with an empty flags array.`;
+
+    try {
+      const r = await callClaude(sys, draft, 2000);
+      let html = '';
+
+      html += '<div class="ledger clearing" id="ledger-live">';
+      html += '<div class="ledger-col ledger-in"><div class="ledger-head"><span>Draft in</span><span>' +
+        esc(r.detected_type || '') + '</span></div><div class="ledger-body cleared-copy" style="border-left-color:var(--rule)">' +
+        esc(draft) + '</div></div>';
+      html += '<div class="par-line"><span class="par-mark">at par</span></div>';
+      html += '<div class="ledger-col ledger-out"><div class="ledger-head"><span>Cleared out</span><span>' +
+        (r.flags ? r.flags.length : 0) + ' settled</span></div><div class="ledger-body cleared-copy">' +
+        renderChanges(r.clean_copy || '') + '</div></div>';
+      html += '</div>';
+
+      if (r.review_note && r.review_note.trim()) {
+        var heavy = (r.review_level || '').toLowerCase() === 'heavy';
+        html += '<div class="approval' + (heavy ? '' : ' light') + '"><span class="approval-icon">' +
+          (heavy ? '!' : '✓') + '</span><div><b>' +
+          (heavy ? 'Heavier sign-off needed.' : 'Routine review.') + '</b> ' +
+          esc(r.review_note) + '</div></div>';
+      }
+
+      html += '<div class="flags-zone"><div class="flags-title"><span>Settled at the par line</span>' +
+        '<span class="flags-count">' + (r.flags ? r.flags.length : 0) + ' item' +
+        ((r.flags && r.flags.length === 1) ? '' : 's') + '</span></div>';
+
+      if (r.flags && r.flags.length) {
+        r.flags.forEach(f => {
+          html += '<div class="flag"><div class="flag-cat">' + esc(f.category || '') +
+            '<span class="flag-sev ' + (f.severity === 'review' ? 'review' : '') + '">' +
+            (f.severity === 'review' ? 'review' : 'fixed') + '</span></div>' +
+            '<div class="flag-body">' +
+            (f.quote ? '<div class="flag-quote">' + esc(f.quote) + '</div>' : '') +
+            '<div class="flag-fix">' + esc(f.fix || '') + '</div></div></div>';
+        });
+      } else {
+        html += '<div class="empty">Nothing to settle. Clear to send.</div>';
+      }
+      html += '</div>';
+
+      if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+      checkOut.innerHTML = html;
+      // let money "flow" through the par line for a beat, then settle
+      const live = document.getElementById('ledger-live');
+      if (live) setTimeout(() => live.classList.remove('clearing'), 1400);
+    } catch (e) {
+      setStatus(checkOut, 'The desk could not complete the run. Try again in a moment.', true);
+    } finally {
+      checkBtn.disabled = false;
+    }
+  });
+
+  // ================= IDEAS =================
+  const ideasBtn = document.getElementById('run-ideas');
+  const ideasOut = document.getElementById('ideas-out');
+  ideasBtn.addEventListener('click', async () => {
+    const notes = document.getElementById('notes').value.trim();
+    if (!notes) return;
+    ideasBtn.disabled = true;
+    setLoading(ideasOut, ['Reading the notes…', 'Finding the angles…', 'Mapping to messaging pillars…', 'Drafting openings in the house voice…']);
+
+    const sys = HOUSE + `
+
+You are TBMC's content strategist. Turn the raw notes below into 3–5 content angles the head of
+marketing can develop without needing deep technical context.
+
+Each idea must map to one messaging pillar: "Stablecoins are better money" / "Stablecoins don't work
+like money yet" / "We've solved this before" / "One integration, universal access" / "The financial
+stack is the next platform".
+
+Cover a mix of these content types where the notes support them: "internal update", "customer facing",
+"explainer" (a plain-language piece unpacking one concept, in the spirit of the at-par explainer).
+
+Respond ONLY with JSON, no fences:
+{
+  "ideas": [
+    { "type": "internal update | customer facing | explainer",
+      "pillar": "one of the five pillars",
+      "title": "sentence-case title, no superlatives",
+      "description": "1-2 plain sentences on the angle and why it matters",
+      "opening": "one concrete first-line or hook the drafter could start from, in TBMC voice" }
+  ]
+}
+Keep everything in house voice. Do not invent facts not supported by the notes; if a claim would need
+verification, phrase the angle so that's clear.`;
+
+    try {
+      const r = await callClaude(sys, notes, 1800);
+      let html = '';
+      (r.ideas || []).forEach(i => {
+        html += '<div class="idea"><div class="idea-tags">' +
+          '<span class="idea-tag type">' + esc(i.type || '') + '</span>' +
+          '<span class="idea-tag pillar">' + esc(i.pillar || '') + '</span></div>' +
+          '<h3 class="idea-title">' + esc(i.title || '') + '</h3>' +
+          '<p class="idea-desc">' + esc(i.description || '') + '</p>' +
+          (i.opening ? '<div class="idea-angle"><b>opening &nbsp;</b>' + esc(i.opening) + '</div>' : '') +
+          '</div>';
+      });
+      if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+      ideasOut.innerHTML = html || '<div class="empty">No angles came back. Try adding a bit more detail to the notes.</div>';
+    } catch (e) {
+      setStatus(ideasOut, 'Could not generate angles. Try again in a moment.', true);
+    } finally {
+      ideasBtn.disabled = false;
+    }
+  });
+
+  // ================= TRANSFORM =================
+  const xBtn = document.getElementById('run-xform');
+  const xOut = document.getElementById('xform-out');
+  xBtn.addEventListener('click', async () => {
+    const src = document.getElementById('xsrc').value.trim();
+    if (!src) return;
+    const dir = document.getElementById('xdir').value;
+    xBtn.disabled = true;
+    setLoading(xOut, ['Reading the source…', 'Shifting register…', 'Reshaping for the channel…']);
+
+    const toLI = dir === 'x2li';
+    const sys = HOUSE + `
+
+You are TBMC's social editor. Convert the source post to the other channel's register.
+Direction: ${toLI ? 'X thread → LinkedIn post' : 'LinkedIn post → X thread'}.
+
+${toLI
+  ? 'Produce a flowing LinkedIn post: connected paragraphs, slightly more formal but human, spell out abbreviations on first use, drop the "1/ 2/" numbering. Keep the substance and the hook.'
+  : 'Produce an X thread: numbered "1/ 2/ 3/" beats, tighter phrasing, lead with the sharpest hook. Abbreviations are fine. Keep it to the essential beats.'}
+
+Keep house rules: em dashes only in moderation (never clustered), one emoji max and never a rocket, "building with" for unsigned
+partnerships, no invented partner claims, TBMC never called an "exchange".
+
+Respond ONLY with JSON, no fences:
+{ "converted": "the rewritten post", "notes": "one short line on what you changed for the register" }`;
+
+    try {
+      const r = await callClaude(sys, src, 1500);
+      if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+      xOut.innerHTML = '<div class="xform">' +
+        '<div class="xform-col"><h4>Source · ' + (toLI ? 'X' : 'LinkedIn') + '</h4><div class="xform-body">' + esc(src) + '</div></div>' +
+        '<div class="xform-col"><h4>Converted · ' + (toLI ? 'LinkedIn' : 'X') + '</h4><div class="xform-body">' + esc(r.converted || '') + '</div></div>' +
+        '</div>' +
+        (r.notes ? '<p class="ea-hint" style="margin-top:14px">' + esc(r.notes) + '</p>' : '');
+    } catch (e) {
+      setStatus(xOut, 'Could not convert. Try again in a moment.', true);
+    } finally {
+      xBtn.disabled = false;
+    }
+  });
+
+  // ================= CLIP TO SOCIAL =================
+  // Uploads straight to the public demo bucket, then asks /api/generate (deployed alongside this
+  // page) to transcribe with Gemini and draft with Claude. Requires the deployed site; in preview
+  // contexts without /api, it reports that plainly.
+  const CLIP_BUCKET = "https://storage.googleapis.com/tbmc-hackathon-082026-anna";
+  const clipBtn = document.getElementById('run-clip');
+  const clipOut = document.getElementById('clip-out');
+  if (clipBtn) clipBtn.addEventListener('click', async () => {
+    const f = document.getElementById('clip-file').files[0];
+    if (!f) { setStatus(clipOut, 'Pick a clip first.', true); return; }
+    const channel = document.getElementById('clip-channel').value;
+    const context = document.getElementById('clip-context').value.trim();
+    clipBtn.disabled = true; clipOut.innerHTML = '';
+    try {
+      // 1) upload directly to the bucket with a unique, create-only name
+      const safe = String(f.name || 'clip').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-60);
+      const uuid = (crypto.randomUUID && crypto.randomUUID()) || String(Math.random()).slice(2);
+      const fileUrl = CLIP_BUCKET + '/uploads/' + Date.now() + '-' + uuid + '-' + safe;
+      setLoading(clipOut, ['Uploading the clip…']);
+      const put = await fetch(fileUrl, { method: 'PUT', headers: { 'Content-Type': f.type || 'application/octet-stream' }, body: f });
+      if (!put.ok) throw new Error('Upload to storage failed (' + put.status + ').');
+
+      // 2) transcribe + draft
+      setLoading(clipOut, ['Transcribing the clip…', 'Listening closely…', 'Writing copy in the house voice…']);
+      const genRes = await fetch('/api/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileUrl, contentType: f.type, channel, context })
+      });
+      if (genRes.status === 404) throw new Error('Clip drafting runs on the deployed site, not in this preview.');
+      const d = await genRes.json();
+      if (!genRes.ok) throw new Error(d.error || 'Generation failed.');
+
+      if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+      let html = '';
+      if (d.approval && String(d.approval).trim()) {
+        html += '<div class="approval"><span class="approval-icon">!</span><div><b>Needs sign-off.</b> ' + esc(d.approval) + '</div></div>';
+      }
+      const optBlock = (title, arr, gold) => {
+        if (!Array.isArray(arr) || !arr.length) return '';
+        return '<div class="xform-col" style="margin-top:18px' + (gold ? ';border-left:3px solid var(--gold);padding-left:14px' : '') + '"><h4>' + title + '</h4>' +
+          arr.map(p => '<div class="xform-body" style="border-bottom:1px dashed var(--rule);padding:10px 0">' + esc(p) + '</div>').join('') + '</div>';
+      };
+      html += optBlock('X', d.x);
+      html += optBlock('LinkedIn', d.linkedin);
+      html += optBlock('Pull quotes', d.pull_quotes, true);
+      if (d.notes) html += '<p class="ea-hint" style="margin-top:14px">' + esc(d.notes) + '</p>';
+      if (d.transcript) html += '<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--slate);font-size:13px">View transcript</summary><div class="xform-body" style="margin-top:8px">' + esc(d.transcript) + '</div></details>';
+      clipOut.innerHTML = html || '<div class="empty">No copy came back. Try another clip.</div>';
+    } catch (e) {
+      setStatus(clipOut, e.message || 'Something went wrong.', true);
+    } finally {
+      clipBtn.disabled = false;
+    }
+  });
+
+  // ============================================================================
+  //  FUN ELEMENTS
+  // ----------------------------------------------------------------------------
+  //  1) TIMELINE QUIPS — the strip at the bottom of the X <-> LinkedIn tab.
+  //     EDIT THIS LIST: these are real, on-brand quips. Add, remove, or replace
+  //     with your own approved lines (finance/stablecoin humor). One per entry.
+  //     Keep "text" short; "cite" is optional (e.g. a handle or "overheard").
+  //     It rotates by day, so the same one shows all day, then changes.
+  // ============================================================================
+  const QUIPS = [
+    { text: "A wire transfer is just a very expensive text message that says \"trust me\"." },
+    { text: "\"Instant\" settlement, 3 to 5 business days, and \"the funds are on their way\" walk into a bar. Nobody knows when they'll arrive." },
+    { text: "Every stablecoin is worth exactly one dollar. Some more exactly than others." },
+    { text: "Treasury ops is professional guessing about where the money went, done very confidently." },
+    { text: "Nothing says \"the future of money\" like paying a 30-cent fee to move a tenth of a cent." },
+    { text: "Two stablecoins that are both worth a dollar somehow cost you money to trade between. Make it make sense." },
+    { text: "\"Real-time payments\" available 9 to 5, Monday to Friday, excluding holidays." },
+    { text: "The money isn't lost. It's just in that special place between \"sent\" and \"received\" where it earns someone else interest." },
+    { text: "Cross-border payments: faster to fly the cash there yourself." },
+    { text: "We put a man on the moon in 1969 and my transfer still needs three business days to clear." }
+  ];
+
+  function renderQuip(i) {
+    const el = document.getElementById('quip-body');
+    if (!el) return;
+    const q = QUIPS[i];
+    el.classList.add('quote', 'fun-fade');
+    el.style.opacity = 0;
+    setTimeout(function () {
+      el.innerHTML = esc(q.text) + (q.cite ? '<div class="fun-strip-cite">' + esc(q.cite) + '</div>' : '');
+      el.style.opacity = 1;
+    }, 160);
+  }
+
+  let quipIndex = Math.floor(Math.random() * QUIPS.length);
+  function nextQuip() {
+    quipIndex = (quipIndex + 1) % QUIPS.length;
+    renderQuip(quipIndex);
+  }
+  // one quip per page load (random), no auto-rotation; Next advances manually
+  (function initQuip() {
+    const el = document.getElementById('quip-body');
+    if (!el) return;
+    const q = QUIPS[quipIndex];
+    el.classList.add('quote');
+    el.innerHTML = esc(q.text) + (q.cite ? '<div class="fun-strip-cite">' + esc(q.cite) + '</div>' : '');
+  })();
+  var quipBtn = document.getElementById('quip-next');
+  if (quipBtn) quipBtn.addEventListener('click', nextQuip);
+
+  // ============================================================================
+  //  2) MONEY FACT — the strip at the bottom of the Source ideas tab.
+  //     Claude generates a fresh payments/money fun fact each load (and on
+  //     "New fact"). No editing needed; it stays factual and on-topic.
+  // ============================================================================
+  // ============================================================================
+  //  2) MONEY FACTS — the strip at the bottom of the Source ideas tab.
+  //     Baked-in, curated, genuinely true facts. No network call, so it always
+  //     works. "New fact" shuffles to another. To add your own, append to the list.
+  // ============================================================================
+  const MONEY_FACTS = [
+    "The word \"salary\" comes from the Latin for salt. Roman soldiers were partly paid in it, which is also where \"worth his salt\" comes from.",
+    "For about 300 years, the Pacific island of Yap used giant stone discs as money. Some were so big they never moved. Ownership just changed by agreement, an early ledger.",
+    "The dollar sign likely evolved from the handwritten abbreviation for the Spanish peso, \"ps\", which over time collapsed into a single mark.",
+    "The Federal Reserve's interbank system, Fedwire, moves more than the entire annual US GDP every few days.",
+    "Sweden's Riksbank issued Europe's first banknotes in 1661, then nearly collapsed because it printed too many. The lesson about reserves is roughly as old as the notes.",
+    "A US penny costs more than a cent to manufacture, so the currency loses money by existing.",
+    "Medieval European merchants settled debts at traveling \"champagne fairs\" without moving coins, netting what they owed each other. A clearinghouse in all but name.",
+    "The largest denomination the US ever printed was the $100,000 bill, used only for transfers between Federal Reserve banks, never for the public.",
+    "\"Bankrupt\" comes from the Italian \"banca rotta\", or broken bench, from the practice of breaking the bench of a money changer who could not pay.",
+    "The average US paper bill is folded, crumpled, and handled so much it lasts only a few years, while a coin can circulate for decades.",
+    "China issued the first government paper money over a thousand years ago, and also discovered the first paper-money inflation crisis not long after.",
+    "The checkmark on a bank ledger and the modern \"clearing\" of a check share a root: clearing simply meant making the accounts clear, or settled, between parties.",
+    "Cross-border payments today can still take three to five days to settle, a pace that would be familiar to a merchant sending a letter of credit in the 1800s.",
+    "Tally sticks, notched pieces of wood, served as official English government money and debt records for over 600 years."
+  ];
+
+  const factBody = document.getElementById('fact-body');
+  const factBtn = document.getElementById('fact-refresh');
+  let lastFactIndex = -1;
+
+  function showFact() {
+    if (!factBody) return;
+    let i = Math.floor(Math.random() * MONEY_FACTS.length);
+    if (MONEY_FACTS.length > 1) { while (i === lastFactIndex) i = Math.floor(Math.random() * MONEY_FACTS.length); }
+    lastFactIndex = i;
+    factBody.classList.add('fun-fade');
+    factBody.style.opacity = 0;
+    setTimeout(function () { factBody.textContent = MONEY_FACTS[i]; factBody.style.opacity = 1; }, 160);
+  }
+  if (factBtn) factBtn.addEventListener('click', showFact);
+  // first one shows instantly (no fade-from-blank)
+  if (factBody) { factBody.textContent = MONEY_FACTS[lastFactIndex = Math.floor(Math.random() * MONEY_FACTS.length)]; }
+})();
 </script>
+
 </body>
 </html>

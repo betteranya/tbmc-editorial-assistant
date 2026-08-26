@@ -1,0 +1,11 @@
+{
+  "name": "tbmc-clip-vercel",
+  "version": "1.0.0",
+  "description": "Clip to social, Vercel. Browser uploads direct to a public demo bucket; a serverless function points Gemini at the file and Claude writes the copy.",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1",
+    "@google/genai": "^0.3.0"
+  }
+}
